@@ -1,45 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
   <title>2048</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"/>
+  
+  <!-- Styles -->
   <link href="style/main.css" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
-  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone 5+ -->
-  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x920.png"  media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone, retina -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-webapp.js?2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #faf8ef; 
+      font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .menu-icon {
+      font-size: 24px;
+      color: #776e65;
+      cursor: pointer;
+    }
+
+    .title {
+      font-size: 36px;
+      color: #776e65;
+      margin: 0;
+    }
+
+    .score-section {
+      display: flex;
+      gap: 10px;
+    }
+
+    .score-box, .best-score-box {
+      background-color: #bbada0;
+      border-radius: 8px;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      min-width: 60px;
+    }
+
+    .score-box span:first-child,
+    .best-score-box span:first-child {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .score-box span:last-child,
+    .best-score-box span:last-child {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .game-container {
+      background: #bbada0;
+      border-radius: 10px;
+      padding: 10px;
+      position: relative;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .grid-row {
+      display: contents;
+    }
+
+    .grid-cell {
+      width: 100%;
+      height: 100px;
+      background-color: #cdc1b4;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: #776e65;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #faf8ef;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #ccc;
+    }
+
+    .footer-btn {
+      background-color: #f5f5f5;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #776e65;
+      cursor: pointer;
+    }
+
+    .footer-btn:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="heading">
+    <!-- Header -->
+    <header>
+      <div class="menu-icon">☰</div>
       <h1 class="title">2048</h1>
-      <div class="scores-container">
-        <div class="score-container">0</div>
-        <div class="best-container">0</div>
-      </div>
-    </div>
-
-    <div class="above-game">
-      <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
-      <a class="restart-button">New Game</a>
-    </div>
-
-    <div class="game-container">
-      <div class="game-message">
-        <p></p>
-        <div class="lower">
-	        <a class="keep-playing-button">Keep going</a>
-          <a class="retry-button">Try again</a>
+      <div class="score-section">
+        <div class="score-box">
+          <span>SCORE</span>
+          <span id="score" class="score-container">0</span>
+        </div>
+        <div class="best-score-box">
+          <span>BEST</span>
+          <span id="best-score" class="best-container">0</span>
         </div>
       </div>
+    </header>
 
+    <!-- Game Grid -->
+    <div class="game-container">
       <div class="grid-container">
         <div class="grid-row">
           <div class="grid-cell"></div>
@@ -66,25 +174,19 @@
           <div class="grid-cell"></div>
         </div>
       </div>
-
-      <div class="tile-container">
-
-      </div>
+      <div class="tile-container"></div>
     </div>
 
-    <p class="game-explanation">
-      <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
-    </p>
-    <hr>
-    <p>
-    <strong class="important">Note:</strong> This site is the official version of 2048. You can play it on your phone via <a href="http://git.io/2048">http://git.io/2048.</a> All other apps or sites are derivatives or fakes, and should be used with caution.
-    </p>
-    <hr>
-    <p>
-    Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
-    </p>
+    <!-- Footer Buttons -->
+    <footer>
+      <button class="footer-btn undo-btn">Undo</button>
+      <button class="footer-btn shuffle-btn">Shuffle</button>
+      <button class="footer-btn settings-btn">Settings</button>
+      <button class="footer-btn leaderboard-btn">Leaderboard</button>
+    </footer>
   </div>
 
+  <!-- Original JS Files -->
   <script src="js/bind_polyfill.js"></script>
   <script src="js/classlist_polyfill.js"></script>
   <script src="js/animframe_polyfill.js"></script>
@@ -95,5 +197,25 @@
   <script src="js/local_storage_manager.js"></script>
   <script src="js/game_manager.js"></script>
   <script src="js/application.js"></script>
+
+  <!-- Telegram Integration Script -->
+  <script>
+    const tg = window.Telegram.WebApp;
+
+    // Make WebApp expand to full screen
+    tg.ready();
+    tg.expand();
+
+    // Example button actions
+    document.querySelector('.undo-btn')?.addEventListener('click', () => {
+      tg.HapticFeedback.notificationOccurred('success');
+      alert("Undo functionality goes here");
+    });
+
+    document.querySelector('.shuffle-btn')?.addEventListener('click', () => {
+      tg.HapticFeedback.impactOccurred('medium');
+      alert("Shuffle functionality goes here");
+    });
+  </script>
 </body>
 </html>
